@@ -2,7 +2,7 @@ use regex::Regex;
 
 pub mod expressions;
 
-pub fn apply_filename_template(template: &str, filename: &str) -> String {
+pub fn apply_name_template(template: &str, filename: &str) -> String {
     match template {
         "__name__" => filename.to_string(),
         "__upperCase_name__" => filename.to_uppercase().to_string(),

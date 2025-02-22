@@ -1,6 +1,6 @@
 #[cfg(test)]
 pub mod tests {
-    use crate::parsers::{apply_filename_template, expressions::FILENAME_EXPRESSIONS};
+    use crate::parsers::{apply_name_template, expressions::FILENAME_EXPRESSIONS};
 
     #[test]
     fn test_apply_filename_template() {
@@ -19,7 +19,7 @@ pub mod tests {
         ];
 
         for (i, expression) in FILENAME_EXPRESSIONS.into_iter().enumerate() {
-            let output = apply_filename_template(expression, FILENAME);
+            let output = apply_name_template(expression, FILENAME);
             assert_eq!(output, expected_filename_output[i])
         }
     }
