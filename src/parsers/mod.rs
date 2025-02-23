@@ -1,20 +1,33 @@
 use regex::Regex;
 
-pub mod expressions;
-
 pub fn apply_name_template(template: &str, filename: &str) -> String {
     match template {
-        "__name__" => filename.to_string(),
-        "__upperCase_name__" => filename.to_uppercase().to_string(),
-        "__lowerCase_name__" => filename.to_lowercase().to_string(),
-        "__camelCase_name__" => parse_camel_case(filename),
-        "__pascalCase_name__" => parse_pascal_case(filename),
-        "__snakeCase_name__" => parse_snake_case(filename),
-        "__upperSnakeCase_name__" => parse_snake_case(filename).to_uppercase(),
-        "__kebabCase_name__" => parse_snake_case(filename).replace("_", "-"),
-        "__lowerDotCase_name__" => parse_snake_case(filename).replace("_", "."),
+        "__name__" | "{{name}}" => filename.to_string(),
+        "__upperCase_name__" | "{{upperCase name}}" => filename.to_uppercase().to_string(),
+        "__lowerCase_name__" | "{{lowerCase name}}" => filename.to_lowercase().to_string(),
+        "__camelCase_name__" | "{{camelCase name}}" => parse_camel_case(filename),
+        "__pascalCase_name__" | "{{pascalCase name}}" => parse_pascal_case(filename),
+        "__snakeCase_name__" | "{{snakeCase name}}" => parse_snake_case(filename),
+        "__upperSnakeCase_name__" | "{{upperSnakeCase name}}" => {
+            parse_snake_case(filename).to_uppercase()
+        }
+        "__kebabCase_name__" | "{{kebabCase name}}" => parse_snake_case(filename).replace("_", "-"),
+        "__lowerDotCase_name__" | "{{lowerDotCase name}}" => {
+            parse_snake_case(filename).replace("_", ".")
+        }
         _ => filename.to_string(),
     }
+}
+
+pub fn apply_all_templates_to_string(mut input: String, replacement: &str) -> String {
+    let get_template_names_regex = Regex::new(r"(\{\{(name|upperCase name|lowerCase name|camelCase name|pascalCase name|snakeCase name|upperSnakeCase name|kebabCase name|lowerDotCase name)\}\})").unwrap();
+    input = get_template_names_regex
+        .replace_all(&input, |captured: &regex::Captures| {
+            format!("{}", apply_name_template(&captured[1], replacement),)
+        })
+        .into_owned();
+
+    input
 }
 
 fn parse_camel_case(filename: &str) -> String {

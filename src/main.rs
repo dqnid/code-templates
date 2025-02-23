@@ -1,11 +1,14 @@
 mod files;
 mod parsers;
 
-use std::fs;
+use std::{
+    fs::{self, File},
+    io::Write,
+};
 
 use files::*;
 use inquire::{Select, Text};
-use parsers::apply_name_template;
+use parsers::{apply_all_templates_to_string, apply_name_template};
 use regex::Regex;
 
 #[cfg(test)]
@@ -37,6 +40,7 @@ fn main() {
     }
 }
 
+// TODO: clean up the mess, should encapsulate parsing and regex into specific functions to improve readability
 fn create_template(
     template_path: String,
     target_name: String,
@@ -49,6 +53,7 @@ fn create_template(
 
         to_create_path.replace_range(0..template_path.len(), &target_path);
 
+        // TODO: migrate to new "apply all templates to string" strategy (change the function to allow for filename type of expressions)
         let get_path_names_regex = Regex::new(r"\/(__.*__)").unwrap();
         to_create_path = get_path_names_regex
             .replace_all(&to_create_path, |captured: &regex::Captures| {
@@ -57,15 +62,32 @@ fn create_template(
             .into_owned();
 
         if path.is_dir() {
-            // Create path
-            create_template(
-                path.display().to_string(),
-                target_name.clone(),
-                to_create_path,
-            )
-            .unwrap();
+            let dir_create_result = fs::create_dir(&to_create_path);
+            match dir_create_result {
+                Ok(_) => {
+                    create_template(
+                        path.display().to_string(),
+                        target_name.clone(),
+                        to_create_path,
+                    )
+                    .unwrap();
+                }
+                Err(_) => return Err(()),
+            }
         } else {
-            // Create file
+            let template_file_content = fs::read_to_string(path).unwrap();
+            let target_file_content =
+                apply_all_templates_to_string(template_file_content, &target_name);
+            let file_result = File::create(to_create_path);
+            match file_result {
+                Ok(mut file) => {
+                    let write_result = file.write_all(target_file_content.as_bytes());
+                    if let Err(_) = write_result {
+                        return Err(());
+                    }
+                }
+                Err(_) => return Err(()),
+            }
         }
     }
 
