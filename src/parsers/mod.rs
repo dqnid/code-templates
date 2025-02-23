@@ -3,27 +3,31 @@ use regex::Regex;
 pub fn apply_name_template(template: &str, filename: &str) -> String {
     match template {
         "__name__" | "{{name}}" => filename.to_string(),
-        "__upperCase_name__" | "{{upperCase name}}" => filename.to_uppercase().to_string(),
-        "__lowerCase_name__" | "{{lowerCase name}}" => filename.to_lowercase().to_string(),
-        "__camelCase_name__" | "{{camelCase name}}" => parse_camel_case(filename),
-        "__pascalCase_name__" | "{{pascalCase name}}" => parse_pascal_case(filename),
-        "__snakeCase_name__" | "{{snakeCase name}}" => parse_snake_case(filename),
-        "__upperSnakeCase_name__" | "{{upperSnakeCase name}}" => {
+        "__upperCase_name__" | "{{upperCasename}}" => filename.to_uppercase().to_string(),
+        "__lowerCase_name__" | "{{lowerCasename}}" => filename.to_lowercase().to_string(),
+        "__camelCase_name__" | "{{camelCasename}}" => parse_camel_case(filename),
+        "__pascalCase_name__" | "{{pascalCasename}}" => parse_pascal_case(filename),
+        "__snakeCase_name__" | "{{snakeCasename}}" => parse_snake_case(filename),
+        "__upperSnakeCase_name__" | "{{upperSnakeCasename}}" => {
             parse_snake_case(filename).to_uppercase()
         }
-        "__kebabCase_name__" | "{{kebabCase name}}" => parse_snake_case(filename).replace("_", "-"),
-        "__lowerDotCase_name__" | "{{lowerDotCase name}}" => {
+        "__kebabCase_name__" | "{{kebabCasename}}" => parse_snake_case(filename).replace("_", "-"),
+        "__lowerDotCase_name__" | "{{lowerDotCasename}}" => {
             parse_snake_case(filename).replace("_", ".")
         }
         _ => filename.to_string(),
     }
 }
 
+// FIXME: admit space between `{}` and name|upperCase name...
 pub fn apply_all_templates_to_string(mut input: String, replacement: &str) -> String {
-    let get_template_names_regex = Regex::new(r"(\{\{(name|upperCase name|lowerCase name|camelCase name|pascalCase name|snakeCase name|upperSnakeCase name|kebabCase name|lowerDotCase name)\}\})").unwrap();
+    let get_template_names_regex = Regex::new(r"(\{\{[\s]*(name|upperCase name|lowerCase name|camelCase name|pascalCase name|snakeCase name|upperSnakeCase name|kebabCase name|lowerDotCase name)[\s]*\}\})").unwrap();
     input = get_template_names_regex
         .replace_all(&input, |captured: &regex::Captures| {
-            format!("{}", apply_name_template(&captured[1], replacement),)
+            format!(
+                "{}",
+                apply_name_template(&captured[1].replace(" ", ""), replacement),
+            )
         })
         .into_owned();
 

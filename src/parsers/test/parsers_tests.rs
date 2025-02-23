@@ -15,15 +15,15 @@ pub mod tests {
     ];
 
     pub const _TEMPLATE_EXPRESSIONS: [&str; 9] = [
-        "{{name}}",
-        "{{upperCase name}}",
-        "{{lowerCase name}}",
-        "{{camelCase name}}",
-        "{{pascalCase name}}",
-        "{{snakeCase name}}",
-        "{{upperSnakeCase name}}",
-        "{{kebabCase name}}",
-        "{{lowerDotCase name}}",
+        "{{ name }}",
+        "{{ upperCase name }}",
+        "{{ lowerCase name }}",
+        "{{ camelCase name }}",
+        "{{ pascalCase name }}",
+        "{{ snakeCase name }}",
+        "{{ upperSnakeCase name }}",
+        "{{ kebabCase name }}",
+        "{{ lowerDotCase name }}",
     ];
 
     #[test]
