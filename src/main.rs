@@ -30,11 +30,44 @@ fn main() {
         let target_name_result = Text::new("Insert the desired name:").prompt();
 
         if let Ok(target_name) = target_name_result {
-            // TODO: decide if the path should be inserted automatically of with a loop of selections -> Maybe better the loop
-            let target_path_result = Text::new("Insert the target path:").prompt();
+            let mut target_path_heap = "./".to_string();
+            const CONFIRM_OPTION: &str = "-- Current --";
+            const CANCEL_OPTION: &str = "-- Cancel --";
 
-            if let Ok(target_path) = target_path_result {
-                create_template(template_path, target_name, target_path).unwrap();
+            loop {
+                let mut sub_directory_list = get_sub_dirs_paths(&target_path_heap);
+                sub_directory_list.insert(0, CONFIRM_OPTION.to_string());
+                sub_directory_list.push(CANCEL_OPTION.to_string());
+
+                let target_path_result = Select::new(
+                    &format!(
+                        "Select a target directory\n Current is: {}",
+                        &target_path_heap
+                    ),
+                    sub_directory_list,
+                )
+                .prompt();
+                if let Ok(target_path) = target_path_result {
+                    // TODO: also check if dir has no subdirs
+                    if target_path == CANCEL_OPTION {
+                        break;
+                    }
+
+                    if target_path == CONFIRM_OPTION {
+                        create_template(
+                            template_path.clone(),
+                            target_name.clone(),
+                            target_path_heap.clone(),
+                        )
+                        .unwrap();
+                        break;
+                    } else {
+                        target_path_heap = target_path;
+                    }
+                } else {
+                    // TODO: manage Error
+                    break;
+                }
             }
         }
     }

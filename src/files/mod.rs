@@ -20,6 +20,20 @@ pub fn get_template_options(base_paths: Vec<String>) -> Vec<String> {
     type_options
 }
 
+pub fn get_sub_dirs_paths(dir: &str) -> Vec<String> {
+    let paths = fs::read_dir(dir).unwrap();
+
+    let mut valid_dirs: Vec<String> = vec![];
+
+    for path in paths {
+        let _path = path.unwrap().path();
+        if _path.is_dir() {
+            valid_dirs.push(_path.display().to_string());
+        }
+    }
+    return valid_dirs;
+}
+
 pub fn get_valid_dirs_paths(dir: &str) -> Vec<String> {
     // FIXME: this panics when the directory does not exist
     let paths = fs::read_dir(dir).unwrap();

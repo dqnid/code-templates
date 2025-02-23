@@ -19,7 +19,6 @@ pub fn apply_name_template(template: &str, filename: &str) -> String {
     }
 }
 
-// FIXME: admit space between `{}` and name|upperCase name...
 pub fn apply_all_templates_to_string(mut input: String, replacement: &str) -> String {
     let get_template_names_regex = Regex::new(r"(\{\{[\s]*(name|upperCase name|lowerCase name|camelCase name|pascalCase name|snakeCase name|upperSnakeCase name|kebabCase name|lowerDotCase name)[\s]*\}\})").unwrap();
     input = get_template_names_regex
